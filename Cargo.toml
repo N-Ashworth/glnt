@@ -1,0 +1,8 @@
+[package]
+name = "glint"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+glfw = "0.56"
+gl = "0.14"
