@@ -7,9 +7,10 @@ pub struct Mesh {
     vbo: u32,
     ebo: u32,
 
+    attr_vbos: Vec<u32>,
+
     index_count: i32,
 }
-
 impl Mesh {
     pub fn new(
         vertices: Vec<f32>,
@@ -68,8 +69,75 @@ impl Mesh {
             vao,
             vbo,
             ebo,
+            attr_vbos: vec![],
             index_count: indices.len() as i32,
         }
+    }
+
+    pub fn attr_vec2(&mut self, loc: u32, data: Vec<[f32; 2]>) {
+        let mut vbo = 0;
+
+        unsafe {
+            gl::BindVertexArray(self.vao);
+
+            gl::GenBuffers(1, &mut vbo);
+            gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+
+            gl::BufferData(
+                gl::ARRAY_BUFFER,
+                (data.len() * mem::size_of::<[f32; 2]>()) as isize,
+                data.as_ptr() as *const _,
+                gl::STATIC_DRAW,
+            );
+
+            gl::VertexAttribPointer(
+                loc,
+                2,
+                gl::FLOAT,
+                gl::FALSE,
+                2 * mem::size_of::<f32>() as i32,
+                ptr::null(),
+            );
+
+            gl::EnableVertexAttribArray(loc);
+
+            gl::BindVertexArray(0);
+        }
+
+        self.attr_vbos.push(vbo);
+    }
+
+    pub fn attr_float(&mut self, loc: u32, data: Vec<f32>) {
+        let mut vbo = 0;
+
+        unsafe {
+            gl::BindVertexArray(self.vao);
+
+            gl::GenBuffers(1, &mut vbo);
+            gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+
+            gl::BufferData(
+                gl::ARRAY_BUFFER,
+                (data.len() * mem::size_of::<f32>()) as isize,
+                data.as_ptr() as *const _,
+                gl::STATIC_DRAW,
+            );
+
+            gl::VertexAttribPointer(
+                loc,
+                1,
+                gl::FLOAT,
+                gl::FALSE,
+                mem::size_of::<f32>() as i32,
+                ptr::null(),
+            );
+
+            gl::EnableVertexAttribArray(loc);
+
+            gl::BindVertexArray(0);
+        }
+
+        self.attr_vbos.push(vbo);
     }
 
     pub fn draw(&self) {
@@ -94,6 +162,10 @@ impl Drop for Mesh {
             gl::DeleteVertexArrays(1, &self.vao);
             gl::DeleteBuffers(1, &self.vbo);
             gl::DeleteBuffers(1, &self.ebo);
+
+            for vbo in &self.attr_vbos {
+                gl::DeleteBuffers(1, vbo);
+            }
         }
     }
 }

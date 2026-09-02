@@ -54,6 +54,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gl_nt"
+version = "0.1.0"
+dependencies = [
+ "gl",
+ "glfw",
+]
+
+[[package]]
 name = "glfw"
 version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -74,14 +82,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1dfc32d45fb58ff38b112696907963a7d671e9cf742b16f882062169a053cf88"
 dependencies = [
  "cmake",
-]
-
-[[package]]
-name = "glint"
-version = "0.1.0"
-dependencies = [
- "gl",
- "glfw",
 ]
 
 [[package]]

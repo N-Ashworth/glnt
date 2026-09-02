@@ -12,6 +12,8 @@ pub struct Input {
     mouse_released: HashSet<MouseButton>,
 
     pub mouse_position: (f64, f64),
+
+    pub mouse_scroll: f64
 }
 
 impl Input {
@@ -26,6 +28,8 @@ impl Input {
             mouse_released: HashSet::new(),
 
             mouse_position: (0.0, 0.0),
+
+            mouse_scroll: 0.0,
         }
     }
 
@@ -35,6 +39,8 @@ impl Input {
 
         self.mouse_pressed.clear();
         self.mouse_released.clear();
+
+        self.mouse_scroll = 0.0;
     }
 
     pub fn is_key_held(&self, key: Key) -> bool {
@@ -95,6 +101,7 @@ impl Window {
         window.set_key_polling(true);
         window.set_mouse_button_polling(true);
         window.set_cursor_pos_polling(true);
+        window.set_scroll_polling(true);
         window.set_framebuffer_size_polling(true);
         window.set_close_polling(true);
 
@@ -169,6 +176,10 @@ impl Window {
 
                         Action::Repeat => {}
                     }
+                }
+
+                WindowEvent::Scroll(_, offset) => {
+                    self.input.mouse_scroll = offset;
                 }
 
                 WindowEvent::CursorPos(x, y) => {
