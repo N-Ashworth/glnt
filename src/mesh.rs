@@ -11,6 +11,7 @@ pub struct Mesh {
 
     index_count: i32,
 }
+
 impl Mesh {
     pub fn new(
         vertices: Vec<f32>,
