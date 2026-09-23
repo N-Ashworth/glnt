@@ -2,6 +2,20 @@ use std::ffi::{CString};
 use std::fs;
 use std::ptr;
 
+/// A builder pattern that compiles and links the shader stuff.
+/// 
+/// Only the actual non-default shaders are necessary to be linked.
+///
+/// For instance, only a vertex shader and a fragment shader is ok, as GL uses the default geometry shader:
+/// ```no_run
+/// use gl_nt::ShaderBuilder; 
+///
+/// let mut shader = ShaderBuilder::new()
+/// 	.vertex_from_file("assets/shader.vert")
+/// 	.fragment_from_file("assets/shader.frag").build();
+///
+/// //...
+/// ```
 pub struct ShaderBuilder {
 	vertex: Option<String>,
 	geom: Option<String>,
@@ -9,15 +23,16 @@ pub struct ShaderBuilder {
 }
 
 impl ShaderBuilder {
-	fn new() -> Self {
+	pub fn new() -> Self {
 		Self {
-			None,
-			None,
-			None,
+			vertex: None,
+			geom: None,
+			frag: None,
 		}
 	}
 
-	fn vertex_from_file(&self, path: &str) -> Self {
+
+	pub fn vertex_from_file(&self, path: &str) -> Self {
 		let vertex_source = fs::read_to_string(path)
 			.unwrap_or_else(|e| {
 				panic!(
@@ -33,7 +48,7 @@ impl ShaderBuilder {
 		}
 	}
 
-	fn geometry_from_file(&self, path: &str) -> Self {
+	pub fn geometry_from_file(&self, path: &str) -> Self {
 		let geom_source = fs::read_to_string(path)
 			.unwrap_or_else(|e| {
 				panic!(
@@ -49,7 +64,7 @@ impl ShaderBuilder {
 		}
 	}
 
-	fn fragment_from_file(&self, path: &str) -> Self {
+	pub fn fragment_from_file(&self, path: &str) -> Self {
 		let frag_source = fs::read_to_string(path)
 			.unwrap_or_else(|e| {
 				panic!(
@@ -121,27 +136,29 @@ impl ShaderBuilder {
 		shader
 	}
 
-	fn complain_about_shader() {
-		let mut len = 0;
+	fn complain_about_shader(program: u32) {
+		unsafe {
+			let mut len = 0;
 
-		gl::GetProgramiv(
-			program,
-			gl::INFO_LOG_LENGTH,
-			&mut len,
-		);
+			gl::GetProgramiv(
+				program,
+				gl::INFO_LOG_LENGTH,
+				&mut len,
+			);
 
-		let mut buffer = vec![0u8; len as usize];
+			let mut buffer = vec![0u8; len as usize];
 
-		gl::GetProgramInfoLog(
-			program,
-			len,
-			ptr::null_mut(),
-			buffer.as_mut_ptr() as *mut i8,
-		);
+			gl::GetProgramInfoLog(
+				program,
+				len,
+				ptr::null_mut(),
+				buffer.as_mut_ptr() as *mut i8,
+			);
 
-		let error = String::from_utf8_lossy(&buffer);
+			let error = String::from_utf8_lossy(&buffer);
 
-		panic!("Shader program linking failed:\n{}", error);
+			panic!("Shader program linking failed:\n{}", error);
+		}
 	}
 
 	fn create_program(v_shader: Option<u32>, g_shader: Option<u32>, f_shader: Option<u32>) -> u32 { unsafe {
@@ -169,7 +186,7 @@ impl ShaderBuilder {
 		);
 
 		if success == 0 {
-			Self::complain_about_shader();
+			Self::complain_about_shader(program);
 		}
 
 		if let Some(shader) = v_shader {
@@ -187,7 +204,8 @@ impl ShaderBuilder {
 		program
 	}}
 
-	fn build(&self) -> Shader {
+	/// Remember to put this at the end of the building process!!
+	pub fn build(&self) -> Shader {
 		let mut v_shader = None;
 		let mut g_shader = None;
 		let mut f_shader = None;

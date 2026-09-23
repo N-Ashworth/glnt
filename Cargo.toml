@@ -1,8 +1,13 @@
 [package]
 name = "gl_nt"
-version = "0.1.0"
+version = "1.0.0"
+description = "Small graphics library made to reduce the verbosity of GPU APIs"
+license = "MIT"
+repository = "https://github.com/N-Ashworth/glnt.git"
+
 edition = "2024"
 
 [dependencies]
 glfw = "0.56"
 gl = "0.14"
+image = "0.25"
