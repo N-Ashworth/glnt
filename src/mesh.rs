@@ -1,6 +1,22 @@
 use std::ptr;
 use std::mem;
 
+/// This is the mesh struct. You create a new mesh with `Mesh::new()`.
+/// You need the vertex positions, indices, and the number of dimensions of each vertex.
+/// The vertices are input as a **flat** vec, and make sure it is the right length!
+/// 
+/// This code will not work:
+/// ```no_run
+/// let mut mesh = Mesh::new(
+/// 	vec![
+/// 		0.0, 0.0, 0.0,
+/// 		1.0, 0.0, 0.0,
+/// 		0.0, 1.0, 0.0, //3 dimensional vertices
+/// 	],
+/// 	vec![0, 1, 2],
+/// 	2, //2 dimensions of the mesh???
+/// )
+/// ```
 #[derive(Clone)]
 pub struct Mesh {
 	vao: u32,
@@ -78,7 +94,7 @@ impl Mesh {
 	pub fn quad(mpos: Vec<f32>, width: f32, height: f32) -> Self {
 		let mut vs = vec![];
 		let mut pos = mpos.clone();
-		
+
 		vs.extend(&pos);
 
 		pos[0] += width;

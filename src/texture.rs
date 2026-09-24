@@ -38,6 +38,21 @@ impl TextureFilter {
 	}
 }
 
+/// This is probably the most powerful graphics rendering feature.
+/// It allows post processing, caching... All sorts of things.
+/// What it does is it allows you to render to a texture, instead of the screen buffer.
+///
+/// Example:
+/// ```no_run
+/// let world_fb = Framebuffer::new(app.width, app.height);
+/// 
+/// world_fb.bind();
+/// //... do rendering...
+/// world_fb.unbind();
+/// world_fb.texture().bind(0); //this allows the shader to access the texture in slot 0
+///
+/// post_processing.draw(); //draw the postprocessing to the screen.
+/// ``` 
 pub struct Framebuffer {
 	id: u32,
 	color: Texture,
@@ -121,7 +136,7 @@ impl Framebuffer {
 		}
 	}
 
-	
+
 }
 
 impl Drop for Framebuffer {

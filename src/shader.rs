@@ -16,6 +16,8 @@ use std::ptr;
 ///
 /// //...
 /// ```
+/// 
+/// Note: getting the shader from a source string is coming soon but it isn't here yet (I'm busy making documentation)
 pub struct ShaderBuilder {
 	vertex: Option<String>,
 	geom: Option<String>,
@@ -31,7 +33,7 @@ impl ShaderBuilder {
 		}
 	}
 
-
+	/// Gets the vertex shader from a file path. The path is relative to the project directory, not src/ (this tripped me up, but I suppose most have gotten used to it)
 	pub fn vertex_from_file(&self, path: &str) -> Self {
 		let vertex_source = fs::read_to_string(path)
 			.unwrap_or_else(|e| {
@@ -48,6 +50,7 @@ impl ShaderBuilder {
 		}
 	}
 
+	/// Gets the geometry shader from a file path. The path is relative to the project directory, not src/ (this tripped me up, but I suppose most have gotten used to it)
 	pub fn geometry_from_file(&self, path: &str) -> Self {
 		let geom_source = fs::read_to_string(path)
 			.unwrap_or_else(|e| {
@@ -64,6 +67,7 @@ impl ShaderBuilder {
 		}
 	}
 
+	/// Gets the fragment shader from a file path. The path is relative to the project directory, not src/ (this tripped me up, but I suppose most have gotten used to it)
 	pub fn fragment_from_file(&self, path: &str) -> Self {
 		let frag_source = fs::read_to_string(path)
 			.unwrap_or_else(|e| {
@@ -204,7 +208,7 @@ impl ShaderBuilder {
 		program
 	}}
 
-	/// Remember to put this at the end of the building process!!
+	/// Remember to put this at the end of the building process!! It turns the `ShaderBuilder` into the `Shader` struct.
 	pub fn build(&self) -> Shader {
 		let mut v_shader = None;
 		let mut g_shader = None;
@@ -228,11 +232,22 @@ impl ShaderBuilder {
 	}
 }
 
+///
 pub struct Shader {
 	program: u32,
 }
 
 impl Shader {
+	/// This binds the shader to whatever draw calls are going to happen next.
+	///
+	/// **The shader stays bound!!**
+	///
+	/// ```no_run
+	/// shader.bind();
+	/// mesh1.draw();
+	///
+	/// mesh2.draw(); //this draws with the shader active still!
+	/// ```
 	pub fn bind(&self) {
 		unsafe {
 			gl::UseProgram(self.program);

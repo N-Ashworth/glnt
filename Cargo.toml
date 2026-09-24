@@ -1,6 +1,6 @@
 [package]
 name = "gl_nt"
-version = "1.0.0"
+version = "1.0.1"
 description = "Small graphics library made to reduce the verbosity of GPU APIs"
 license = "MIT"
 repository = "https://github.com/N-Ashworth/glnt.git"
